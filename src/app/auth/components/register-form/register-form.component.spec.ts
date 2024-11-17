@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterFormComponent } from './register-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UsersService } from 'src/app/services/user.service';
+import { getElement, getText, query, queryById } from '@testing';
 
 fdescribe('RegisterFormComponent', () => {
   let component: RegisterFormComponent;
@@ -39,6 +40,26 @@ fdescribe('RegisterFormComponent', () => {
     expect(component.emailField?.invalid).withContext("plain text").toBeTruthy();
     component.emailField?.setValue('  ');
     expect(component.emailField?.invalid).withContext("just blank spaces").toBeTruthy();
+  })
+
+  it('should be the form`s email field invalid from ui', ()=>{
+    const inputElement = getElement(fixture,'input#email') as HTMLInputElement;
+    inputElement.value = ''
+    inputElement.dispatchEvent(new Event('input'));
+    inputElement.dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+
+    const textErrorRequired = getText(fixture,'feedbackEmail-required')
+    expect(textErrorRequired).withContext('required case').toContain("Required");
+
+    inputElement.value = 'no es un correo'
+    inputElement.dispatchEvent(new Event('input'));
+    inputElement.dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+
+    const textErrorEmail = getText(fixture,'feedbackEmail-email')
+    expect(textErrorEmail).withContext('email case').toContain("It's not a email");
+
   })
 
   it('should be the form`s password field invalid and invalid ', ()=>{
