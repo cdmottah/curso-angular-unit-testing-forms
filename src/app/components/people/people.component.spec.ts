@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PeopleComponent } from './people.component';
 import { PersonComponent } from './../person/person.component';
-import { getText, query, queryAll, queryById } from '@testing';
+import { clickEvent, getText, query, queryAll, queryById } from '@testing';
 
 describe('PeopleComponent', () => {
   let component: PeopleComponent;
@@ -31,15 +31,13 @@ describe('PeopleComponent', () => {
   });
 
   it('should raise selected event when clicked', () => {
-    const button = queryById(fixture, 'btn-person');
-    button.triggerEventHandler('click', null);
+    clickEvent(fixture, 'btn-person',true);
     fixture.detectChanges();
     expect(component.selectedPerson).toEqual(component.people[0]);
   });
 
   it('should render person when do click', () => {
-    const buttonDe = queryById(fixture, 'btn-person');
-    buttonDe.triggerEventHandler('click', null);
+    clickEvent(fixture, 'btn-person',true);
     fixture.detectChanges();
     const liDe = getText(fixture, 'selectedPerson');
     expect(component.selectedPerson).toEqual(component.people[0]);

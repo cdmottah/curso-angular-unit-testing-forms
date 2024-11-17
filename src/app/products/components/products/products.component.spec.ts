@@ -5,7 +5,7 @@ import { ProductsService } from 'src/app/services/product.service';
 import { ProductsComponent } from './products.component';
 import { ProductComponent } from './../product/product.component';
 import { ValueService } from 'src/app/services/value.service';
-import { asyncData, asyncError, getText, mockObserable, query, queryById } from '@testing';
+import { asyncData, asyncError, clickEvent, getText, mockObserable, query, queryById } from '@testing';
 
 describe('ProductsComponent', () => {
   let component: ProductsComponent;
@@ -108,12 +108,11 @@ describe('ProductsComponent', () => {
       // Arrange
       const mockMsg = 'my mock string';
       valueService.getPromiseValue.and.returnValue(Promise.resolve(mockMsg));
-      const btnDe = queryById(fixture,'btn-promise');
       // Act
-      btnDe.triggerEventHandler('click', null);
+      clickEvent(fixture, 'btn-promise',true);
       tick();
       fixture.detectChanges();
-      const textRta = getText(fixture,'rta');
+      const textRta = getText(fixture, 'rta');
       // Assert
       expect(component.rta).toEqual(mockMsg);
       expect(valueService.getPromiseValue).toHaveBeenCalled();

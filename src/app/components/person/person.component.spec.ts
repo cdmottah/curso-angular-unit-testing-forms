@@ -4,7 +4,7 @@ import { Person } from './../../models/person';
 
 import { PersonComponent } from './person.component';
 import { first } from 'rxjs/operators';
-import { getText, queryById } from '@testing';
+import { clickEvent, getText, queryById } from '@testing';
 
 describe('PersonComponent', () => {
   let component: PersonComponent;
@@ -37,7 +37,7 @@ describe('PersonComponent', () => {
 
   it('should have <h3> with person name', () => {
     const expectMsg = `Hola, ${component.person.name}`;
-    const h3Element = queryById(fixture,'h3-name');
+    const h3Element = queryById(fixture, 'h3-name');
     const h3Text = getText(fixture, 'h3-name');
 
     expect(h3Element).not.toBeNull();
@@ -55,7 +55,7 @@ describe('PersonComponent', () => {
     component.person.height = 999;
     const expectMsg = `Mi altura es ${component.person.height}`;
 
-     // Act
+    // Act
     fixture.detectChanges();
     const pDebug = getText(fixture, 'p-element');
     // Assert
@@ -88,20 +88,17 @@ describe('PersonComponent', () => {
   it('should display un text with IMC with click', () => {
     // Arrange
     const expectText = 'overweight';
-    const buttonDe = queryById(fixture, 'btn-imc');
-    const buttonEl = buttonDe.nativeElement;
     // Act
-    buttonDe.triggerEventHandler('click', null);
+    clickEvent(fixture, 'btn-imc',true)
     fixture.detectChanges();
     // Assert
-    expect(buttonEl.textContent).toContain(expectText);
+    const text = getText(fixture, 'btn-imc')
+    expect(text).toContain(expectText);
   });
 
   it('should raise selected event when clicked', () => {
     // Arrange
     const expectedPerson = new Person('Nicolas', 'Molina', 28, 68, 1.65);
-    const buttonDe = queryById(fixture, 'btn-person');
-
     let selectedPerson: Person | undefined;
     component.onSelected
       .pipe(first())
@@ -110,7 +107,7 @@ describe('PersonComponent', () => {
       });
     // Act
     component.person = expectedPerson;
-    buttonDe.triggerEventHandler('click', null);
+    clickEvent(fixture, 'btn-person',true);
     fixture.detectChanges();
     // Assert
     expect(selectedPerson).toEqual(expectedPerson);
@@ -162,8 +159,7 @@ describe('PersonComponent from HostComponent', () => {
   });
 
   it('should raise selected event when clicked', () => {
-    const btnDe = queryById(fixture, 'btn-person');
-    btnDe.triggerEventHandler('click', null);
+    clickEvent(fixture, 'btn-person',true);
     fixture.detectChanges();
     expect(component.selectedPerson).toEqual(component.person);
   });
