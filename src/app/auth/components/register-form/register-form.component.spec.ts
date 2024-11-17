@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterFormComponent } from './register-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UsersService } from 'src/app/services/user.service';
-import { getElement, getText, query, queryById } from '@testing';
+import { getElement, getText, query, queryById, setInputValue } from '@testing';
 
 fdescribe('RegisterFormComponent', () => {
   let component: RegisterFormComponent;
@@ -11,17 +11,17 @@ fdescribe('RegisterFormComponent', () => {
   let userService: jasmine.SpyObj<UsersService>
 
   beforeEach(async () => {
-    const userServiceSpy  =jasmine.createSpyObj('UsersService',['create'])
+    const userServiceSpy = jasmine.createSpyObj('UsersService', ['create'])
     await TestBed.configureTestingModule({
-      declarations: [ RegisterFormComponent ],
-      imports:[
+      declarations: [RegisterFormComponent],
+      imports: [
         ReactiveFormsModule,
       ],
-      providers:[
+      providers: [
         { provide: UsersService, useValue: userServiceSpy },
       ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -35,34 +35,30 @@ fdescribe('RegisterFormComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be the form`s email field invalid ', ()=>{
+  it('should be the form`s email field invalid ', () => {
     component.emailField?.setValue('esto no es un correo');
     expect(component.emailField?.invalid).withContext("plain text").toBeTruthy();
     component.emailField?.setValue('  ');
     expect(component.emailField?.invalid).withContext("just blank spaces").toBeTruthy();
   })
 
-  it('should be the form`s email field invalid from ui', ()=>{
-    const inputElement = getElement(fixture,'input#email') as HTMLInputElement;
-    inputElement.value = ''
-    inputElement.dispatchEvent(new Event('input'));
-    inputElement.dispatchEvent(new Event('blur'));
+  it('should be the form`s email field invalid from ui', () => {
+
+    setInputValue(fixture, 'input#email', '');
     fixture.detectChanges();
 
-    const textErrorRequired = getText(fixture,'feedbackEmail-required')
+    const textErrorRequired = getText(fixture, 'feedbackEmail-required')
     expect(textErrorRequired).withContext('required case').toContain("Required");
 
-    inputElement.value = 'no es un correo'
-    inputElement.dispatchEvent(new Event('input'));
-    inputElement.dispatchEvent(new Event('blur'));
+    setInputValue(fixture, 'input#email', 'esto no es un correo');
     fixture.detectChanges();
 
-    const textErrorEmail = getText(fixture,'feedbackEmail-email')
+    const textErrorEmail = getText(fixture, 'feedbackEmail-email')
     expect(textErrorEmail).withContext('email case').toContain("It's not a email");
 
   })
 
-  it('should be the form`s password field invalid and invalid ', ()=>{
+  it('should be the form`s password field invalid and invalid ', () => {
     component.passwordField?.setValue('esto no es una contraseña invalida');
     expect(component.passwordField?.invalid).withContext("without numbers").toBeTruthy();
     component.passwordField?.setValue('12345');
@@ -73,13 +69,13 @@ fdescribe('RegisterFormComponent', () => {
     expect(component.passwordField?.valid).withContext("right").toBeTruthy();
   })
 
-  it('should de form be invalid',()=> {
+  it('should de form be invalid', () => {
     component.form.patchValue({
-      name:'cristian',
-      email:'cdmottah@gmail.com',
+      name: 'cristian',
+      email: 'cdmottah@gmail.com',
       password: 'test234',
-      confirmPassword:'test234',
-      checkTerms:false
+      confirmPassword: 'test234',
+      checkTerms: false
     })
     expect(component.form.valid).toBeFalsy()
   })
