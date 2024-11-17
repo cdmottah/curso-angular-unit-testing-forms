@@ -1,9 +1,9 @@
-import { Component, DebugElement } from '@angular/core';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 
 import { ReversePipe } from './reverse.pipe';
+import { getText, query } from '@testing';
 
 describe('ReversePipe', () => {
   it('create an instance', () => {
@@ -27,7 +27,7 @@ describe('ReversePipe', () => {
 
 @Component({
   template: `
-    <h5>{{ 'amor' | reverse }}</h5>
+    <h5 data-testid="h5-element">{{ 'amor' | reverse }}</h5>
     <input [(ngModel)]="text">
     <p>{{ text | reverse }}</p>
   `
@@ -43,10 +43,10 @@ describe('ReversePipe from HostComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HostComponent, ReversePipe ],
-      imports: [ FormsModule ]
+      declarations: [HostComponent, ReversePipe],
+      imports: [FormsModule]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -60,22 +60,22 @@ describe('ReversePipe from HostComponent', () => {
   });
 
   it('should the h5 be "roma"', () => {
-    const h5De = fixture.debugElement.query(By.css('h5'));
-    expect(h5De.nativeElement.textContent).toEqual('roma');
+    const text = getText(fixture, 'h5-element');
+    expect(text).toEqual('roma');
   });
 
   it('should apply reverse pipe when typing in the input', () => {
-    const inputDe = fixture.debugElement.query(By.css('input'));
+    const inputDe = query(fixture, 'input');
     const inputEl: HTMLInputElement = inputDe.nativeElement;
-    const pDe = fixture.debugElement.query(By.css('p'));
+    const pDe = query(fixture, 'p').nativeElement;
 
-    expect(pDe.nativeElement.textContent).toEqual('');
+    expect(pDe.textContent).toEqual('');
 
     inputEl.value = 'ANA 2'; // 2 ANA
     inputEl.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    expect(pDe.nativeElement.textContent).toEqual('2 ANA');
+    expect(pDe.textContent).toEqual('2 ANA');
   });
 
 });
