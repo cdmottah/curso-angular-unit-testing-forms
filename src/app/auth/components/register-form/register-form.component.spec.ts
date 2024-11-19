@@ -2,7 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { RegisterFormComponent } from './register-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UsersService } from 'src/app/services/user.service';
-import { asyncData, getText, mockObserable, setInputValue } from '@testing';
+import { asyncData, clickElement, getText, mockObserable, setCheckBoxValue, setInputValue } from '@testing';
 import { generateOneUser } from 'src/app/models/user.mock';
 
 fdescribe('RegisterFormComponent', () => {
@@ -100,7 +100,27 @@ fdescribe('RegisterFormComponent', () => {
     expect(component.status).toEqual('init')
   })
 
-  it('should change status flag when form is sended succesfully', fakeAsync(() => {
+  it('should change status flag from "loading" to "success" when form is filled from UI', fakeAsync(() => {
+    setInputValue(fixture, 'input#name', 'Cristian')
+    setInputValue(fixture, 'input#email', 'cdmottah@gmail.com')
+    setInputValue(fixture, 'input#password', 'test1234')
+    setInputValue(fixture, 'input#confirmPassword', 'test1234')
+    setCheckBoxValue(fixture, 'input#checkTerms', true)
+
+    const mockUser = generateOneUser();
+    userService.create.and.returnValue(asyncData(mockUser));
+    clickElement(fixture,'btn-submit',true);
+    fixture.detectChanges();
+    expect(component.status).toEqual('loading')
+    tick();
+    fixture.detectChanges();
+    expect(component.status).toEqual('success')
+    expect(component.form.valid).toBeTruthy();
+    expect(userService.create).toHaveBeenCalledTimes(1);
+  })
+  );
+
+  it('should change status flag from "loading" to "success" when form is sended succesfully', fakeAsync(() => {
     component.form.patchValue({
       name: 'cristian',
       email: 'cdmottah@gmail.com',
@@ -117,8 +137,7 @@ fdescribe('RegisterFormComponent', () => {
     expect(component.status).toEqual('success')
     expect(component.form.valid).toBeTruthy();
     expect(userService.create).toHaveBeenCalledTimes(1);
-  }
-  )
-  )
+  })
+  );
 
 });

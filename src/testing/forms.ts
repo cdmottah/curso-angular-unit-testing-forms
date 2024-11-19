@@ -17,3 +17,19 @@ export function setInputValue<T>(
 
 
 }
+
+export function setCheckBoxValue<T>(
+  fixture: ComponentFixture<T>,
+  testid: string,
+  value:boolean,
+  withtextId: boolean = false,
+) {
+  const element: DebugElement = (withtextId) ? queryById(fixture, testid) : query(fixture, testid);
+  const inputElement = element.nativeElement as HTMLInputElement;
+
+  inputElement.checked = value;
+  inputElement.dispatchEvent(new Event('change'));
+  inputElement.dispatchEvent(new Event('blur'));
+
+
+}
