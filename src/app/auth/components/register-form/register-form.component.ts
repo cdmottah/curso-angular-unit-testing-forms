@@ -24,21 +24,25 @@ export class RegisterFormComponent implements OnInit {
     }
   );
 
+  status: 'loading' | 'success' | 'error' | 'init' = 'init'
+
   constructor(
     private fb: FormBuilder,
     private usersService: UsersService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   register(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
+      this.status = 'loading'
       const value = this.form.value;
       this.usersService.create(value)
-      .subscribe((rta) => {
-        console.log(rta);
-      });
+        .subscribe((rta) => {
+          console.log(rta);
+          this.status = 'success'
+        });
     } else {
       this.form.markAllAsTouched();
     }
