@@ -1,5 +1,7 @@
 import { FormControl, FormGroup } from "@angular/forms";
 import { MyValidators } from "./validators";
+import { UsersService } from '../services/user.service'
+import { mockObserable } from "@testing";
 
 fdescribe('test for my validators', () => {
 
@@ -55,7 +57,51 @@ fdescribe('test for my validators', () => {
         confirmPassword: new FormControl('test2')
       })
 
-      const fn= ()=>{MyValidators.matchPasswords(group)}
+      const fn = () => { MyValidators.matchPasswords(group) }
+      expect(fn).toThrow(new Error('matchPasswords: fields not found'));
+    })
+
+  })
+
+
+  describe('test for email async', () => {
+    let userServiceSpy: jasmine.SpyObj<UsersService>;
+    beforeAll(() => {
+      userServiceSpy = jasmine.createSpyObj('UsersService', ['isAvailableByEmail'])
+    })
+
+    it('should return null when with valid email', (doneFn) => {
+
+      const control = new FormControl('cdmottah@gmail.com');
+
+      userServiceSpy.isAvailableByEmail.and.returnValue(mockObserable({ isAvailable: true }))
+
+      const validator = MyValidators.validateEmailAsync(userServiceSpy);
+
+      validator(control).subscribe(res => {
+        expect(res).toBeNull();
+        doneFn();
+      })
+
+    })
+
+    it('should return an object with key match_password: true when both not match', () => {
+      const group = new FormGroup({
+        password: new FormControl('test'),
+        confirmPassword: new FormControl('test2')
+      })
+
+      const rta = MyValidators.matchPasswords(group);
+      expect(rta?.match_password).toBeTrue();
+    })
+
+    it('should return an error when some password or confirmPassword is not defined', () => {
+      const group = new FormGroup({
+        otherfield: new FormControl('test'),
+        confirmPassword: new FormControl('test2')
+      })
+
+      const fn = () => { MyValidators.matchPasswords(group) }
       expect(fn).toThrow(new Error('matchPasswords: fields not found'));
     })
 
