@@ -11,7 +11,7 @@ describe('RegisterFormComponent', () => {
   let userService: jasmine.SpyObj<UsersService>
 
   beforeEach(async () => {
-    const userServiceSpy = jasmine.createSpyObj('UsersService', ['create'])
+    const userServiceSpy = jasmine.createSpyObj('UsersService', ['create', 'isAvailableByEmail'])
     await TestBed.configureTestingModule({
       declarations: [RegisterFormComponent],
       imports: [
@@ -28,6 +28,7 @@ describe('RegisterFormComponent', () => {
     fixture = TestBed.createComponent(RegisterFormComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UsersService) as jasmine.SpyObj<UsersService>;
+    userService.isAvailableByEmail.and.returnValue(mockObserable({ isAvailable: true }))
     fixture.detectChanges();
   });
 
@@ -109,7 +110,7 @@ describe('RegisterFormComponent', () => {
 
     const mockUser = generateOneUser();
     userService.create.and.returnValue(asyncData(mockUser));
-    clickElement(fixture,'btn-submit',true);
+    clickElement(fixture, 'btn-submit', true);
     fixture.detectChanges();
     expect(component.status).toEqual('loading')
     tick();
@@ -149,7 +150,7 @@ describe('RegisterFormComponent', () => {
 
     const mockUser = generateOneUser();
     userService.create.and.returnValue(asyncError(mockUser));
-    clickElement(fixture,'btn-submit',true);
+    clickElement(fixture, 'btn-submit', true);
     fixture.detectChanges();
     expect(component.status).toEqual('loading')
     tick();
@@ -159,5 +160,18 @@ describe('RegisterFormComponent', () => {
     expect(userService.create).toHaveBeenCalledTimes(1);
   })
   );
+
+  it('should show error when the email is already taken',fakeAsync(()=>{
+
+    userService.isAvailableByEmail.and.returnValue(mockObserable({ isAvailable: false }));
+    setInputValue(fixture,'input#email','cristian@mail.co')
+    tick();
+    fixture.detectChanges();
+    expect(component.emailField?.invalid).withContext('email invalid').toBeTruthy();
+    expect(userService.isAvailableByEmail).withContext('called with right parameters').toHaveBeenCalledWith('cristian@mail.co');
+    const text = getText(fixture,'feedbackEmail-emailasync')
+    expect(text).withContext('show message error').toContain('email is already registered')
+
+  }))
 
 });

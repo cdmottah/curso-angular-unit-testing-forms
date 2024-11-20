@@ -3,7 +3,7 @@ import { MyValidators } from "./validators";
 import { UsersService } from '../services/user.service'
 import { mockObserable } from "@testing";
 
-fdescribe('test for my validators', () => {
+describe('test for my validators', () => {
 
   describe('test for valid password', () => {
 
